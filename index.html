@@ -38,6 +38,7 @@ const eras=[
 {name:'ERA DOS TITÃS',sky:['#483c42','#b97859'],far:'#76534b',mid:'#57413b',near:'#353a37',ground:'#202c2b',sun:'#f0a36f',accent:'#d18c64'},
 {name:'NOVO HORIZONTE',sky:['#334e59','#a4b9a2'],far:'#607d79',mid:'#416861',near:'#294b47',ground:'#1c3734',sun:'#ead7a0',accent:'#a9c9a7'}
 ];
+const eraArt=new Image();eraArt.src='assets/eras.png';
 let save={bank:0,best:0,runs:0,boot:0,gear:0,total:0};try{save={...save,...JSON.parse(localStorage.getItem('evora-save')||'{}')}}catch(e){}
 const persist=()=>localStorage.setItem('evora-save',JSON.stringify(save));
 const eraAt=n=>Math.min(4,Math.floor(n/1600));
@@ -89,7 +90,7 @@ if(save.gear>0){x.strokeStyle='#d9c28f';x.lineWidth=3;x.beginPath();x.moveTo(-11
 if(save.gear>2){x.strokeStyle='#e5d0a0';x.lineWidth=2;x.beginPath();x.arc(0,-46,19,-.9,.85);x.stroke()}
 x.restore();
 }
-function draw(t){if(!W||!H)return;let e=eras[eraAt(save.total+dist)],scroll=active?dist:ambient,g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,e.sky[0]);g.addColorStop(1,e.sky[1]);x.fillStyle=g;x.fillRect(0,0,W,H);
+function draw(t){if(!W||!H)return;let ei=eraAt(save.total+dist),e=eras[ei],scroll=active?dist:ambient,g=x.createLinearGradient(0,0,0,H);if(eraArt.complete&&eraArt.naturalWidth){x.drawImage(eraArt,ei*192,0,192,108,0,0,W,H)}else{g.addColorStop(0,e.sky[0]);g.addColorStop(1,e.sky[1]);x.fillStyle=g;x.fillRect(0,0,W,H)}
 let sx=W*.76-(scroll*.022%(W*.3));x.globalAlpha=.82;x.fillStyle=e.sun;x.beginPath();x.arc(sx,H*.23,Math.min(W,H)*.073,0,Math.PI*2);x.fill();x.globalAlpha=1;
 let glow=x.createRadialGradient(sx,H*.23,4,sx,H*.23,H*.36);glow.addColorStop(0,e.sun+'44');glow.addColorStop(1,e.sun+'00');x.fillStyle=glow;x.fillRect(0,0,W,H);
 ridge(H*.46,34,10,e.far,scroll);
