@@ -93,33 +93,41 @@ function drawRunner(px,py,t){
 function draw(t){
  if(!W||!H)return;
  const ei=eraAt(save.total+dist),e=eras[ei],scroll=active?dist:ambient,im=eraImages[ei];
- if(im&&im.complete&&im.naturalWidth){x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(im,0,0,W,H)}
- else {const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,e.sky[0]);bg.addColorStop(1,e.sky[1]);x.fillStyle=bg;x.fillRect(0,0,W,H)}
- // cinematic atmosphere, sun glow and distant silhouettes
- const glow=x.createRadialGradient(W*.76,H*.28,2,W*.76,H*.28,H*.55);glow.addColorStop(0,e.sun+'55');glow.addColorStop(1,e.sun+'00');x.fillStyle=glow;x.fillRect(0,0,W,H);
- const haze=x.createLinearGradient(0,H*.36,0,H*.78);haze.addColorStop(0,'#ffffff00');haze.addColorStop(.5,'#e7d8bf18');haze.addColorStop(1,'#08141788');x.fillStyle=haze;x.fillRect(0,0,W,H);
- // distant mountain range
- x.fillStyle=e.far;x.beginPath();x.moveTo(0,H*.69);
- for(let p=0;p<=W+10;p+=10){let yy=H*(.52+Math.sin((p+scroll*.025)*.004+ei)*.075+Math.sin(p*.013)*.018);x.lineTo(p,yy)}
- x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();
- // mountain ridges with lit edges
- x.strokeStyle='#e6d7bd44';x.lineWidth=2;x.beginPath();for(let p=0;p<=W;p+=12){let yy=H*(.52+Math.sin((p+scroll*.025)*.004+ei)*.075+Math.sin(p*.013)*.018);if(p===0)x.moveTo(p,yy);else x.lineTo(p,yy)}x.stroke();
- // middle forest / rock columns
- x.fillStyle=e.mid;x.beginPath();x.moveTo(0,H*.75);for(let p=0;p<=W+10;p+=8)x.lineTo(p,H*(.65+Math.sin((p+scroll*.09)*.009+2)*.045+Math.sin(p*.021)*.018));x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();
- for(let i=0;i<17;i++){let px=((i*97-scroll*.18)%(W+120)+W+120)%(W+120)-60,base=H*(.72+(i%3)*.035),s=H*(.045+(i%4)*.012);if(ei===1||ei===3){x.fillStyle=e.near;x.beginPath();x.moveTo(px-s,base);x.lineTo(px-s*.6,base-s*2);x.lineTo(px+s*.3,base-s*2.3);x.lineTo(px+s,base);x.fill()}else{pine(px,base,s,e.near)}}
- // foreground terrain with perspective trail
- const ground=x.createLinearGradient(0,H*.75,0,H);ground.addColorStop(0,e.near);ground.addColorStop(1,e.ground);x.fillStyle=ground;x.beginPath();x.moveTo(0,H*.78);x.quadraticCurveTo(W*.48,H*.72,W,H*.79);x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();
- // winding trail gives depth
- x.fillStyle='#b7a08024';x.beginPath();x.moveTo(W*.18,H);x.quadraticCurveTo(W*.42,H*.81,W*.44,H*.77);x.quadraticCurveTo(W*.66,H*.81,W*.84,H);x.closePath();x.fill();
- x.strokeStyle='#d5c29a35';x.lineWidth=2;x.beginPath();x.moveTo(W*.18,H);x.quadraticCurveTo(W*.42,H*.81,W*.44,H*.77);x.stroke();
- // foreground stones and grasses move past the traveler
- for(let i=0;i<42;i++){let px=((i*61-scroll*.9)%(W+70)+W+70)%(W+70)-35,py=H*(.82+(i%5)*.035),s=2+(i%5)*1.4;x.fillStyle=i%3===0?'#c9b28a55':'#0b171b88';x.beginPath();x.ellipse(px,py,s*1.8,s*.7,(i%4)*.2,0,Math.PI*2);x.fill();if(i%3===0){x.strokeStyle=e.accent+'99';x.lineWidth=1.3;x.beginPath();x.moveTo(px,py);x.lineTo(px-3,py-8-s);x.moveTo(px,py);x.lineTo(px+4,py-6-s);x.stroke()}}
- // drifting embers / dust, layered at different speeds
- for(let i=0;i<30;i++){let px=((i*83-scroll*(.12+(i%3)*.05))%(W+30)+W+30)%(W+30)-15,py=H*(.2+(i%9)*.075)+Math.sin(t*.001+i)*5;x.globalAlpha=.12+(i%4)*.055;x.fillStyle=i%5===0?'#fff0c8':e.accent;x.beginPath();x.arc(px,py,.8+(i%3)*.55,0,Math.PI*2);x.fill()}x.globalAlpha=1;
- // subtle cinematic edge shade
- const edge=x.createRadialGradient(W*.5,H*.48,H*.18,W*.5,H*.48,H*.78);edge.addColorStop(0,'#00000000');edge.addColorStop(1,'#07101488');x.fillStyle=edge;x.fillRect(0,0,W,H);
+ // Ilustração panorâmica em alta resolução, com enquadramento responsivo.
+ x.save();
+ if(im&&im.complete&&im.naturalWidth){
+   const scale=Math.max(W/im.naturalWidth,H/im.naturalHeight),dw=im.naturalWidth*scale,dh=im.naturalHeight*scale;
+   const sway=Math.sin(t*.00018)*Math.min(7,W*.008);
+   x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';
+   x.drawImage(im,(W-dw)/2+sway,(H-dh)/2,dw,dh);
+ }else{
+   const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,e.sky[0]);bg.addColorStop(1,e.ground);x.fillStyle=bg;x.fillRect(0,0,W,H);
+ }
+ // Profundidade atmosférica e luz volumétrica.
+ const glow=x.createRadialGradient(W*.74,H*.27,1,W*.74,H*.27,H*.62);
+ glow.addColorStop(0,e.sun+'35');glow.addColorStop(.45,e.sun+'12');glow.addColorStop(1,e.sun+'00');
+ x.fillStyle=glow;x.fillRect(0,0,W,H);
+ const mist=x.createLinearGradient(0,H*.38,0,H*.9);
+ mist.addColorStop(0,'#fff0');mist.addColorStop(.55,'#e7dfc51a');mist.addColorStop(1,'#07101466');
+ x.fillStyle=mist;x.fillRect(0,0,W,H);
+ // Poeira e partículas em planos de profundidade diferentes.
+ for(let i=0;i<46;i++){
+   const speed=.10+(i%5)*.045;
+   const px=((i*79-scroll*speed)%(W+40)+W+40)%(W+40)-20;
+   const py=H*(.13+(i*37%73)/100)+Math.sin(t*.0007+i*1.7)*7;
+   const radius=.65+(i%4)*.45;
+   x.globalAlpha=.13+(i%5)*.045;x.fillStyle=i%7===0?'#fff0c8':e.accent;
+   x.beginPath();x.arc(px,py,radius,0,Math.PI*2);x.fill();
+ }
+ x.globalAlpha=1;
+ // Vinheta cinematográfica discreta.
+ const edge=x.createRadialGradient(W*.5,H*.48,H*.2,W*.5,H*.48,H*.82);
+ edge.addColorStop(0,'#00000000');edge.addColorStop(1,'#07101499');
+ x.fillStyle=edge;x.fillRect(0,0,W,H);
  drawRunner(W*.29,H*.79,t);
-}function update(){let ei=eraAt(save.total);$('best').textContent=save.best+' m';$('bank').textContent=save.bank;$('runs').textContent=save.runs;$('bestEra').textContent='ERA '+['I','II','III','IV','V'][ei];let a=30+save.boot*25,b=45+save.gear*35;$('bootCost').textContent='◇ '+a+' · NÍV. '+save.boot;$('gearCost').textContent='◇ '+b+' · NÍV. '+save.gear;$('uBoot').disabled=save.bank<a;$('uGear').disabled=save.bank<b;$('eraLabel').textContent='ERA '+['I','II','III','IV','V'][ei]+' · '+eras[ei].name}
+ x.restore();
+}
+function update(){let ei=eraAt(save.total);$('best').textContent=save.best+' m';$('bank').textContent=save.bank;$('runs').textContent=save.runs;$('bestEra').textContent='ERA '+['I','II','III','IV','V'][ei];let a=30+save.boot*25,b=45+save.gear*35;$('bootCost').textContent='◇ '+a+' · NÍV. '+save.boot;$('gearCost').textContent='◇ '+b+' · NÍV. '+save.gear;$('uBoot').disabled=save.bank<a;$('uGear').disabled=save.bank<b;$('eraLabel').textContent='ERA '+['I','II','III','IV','V'][ei]+' · '+eras[ei].name}
 function start(){if(active)return;active=true;dist=0;loot=0;last=performance.now();$('overlay').classList.add('hidden');$('hud').classList.remove('hidden');$('progress').classList.remove('hidden');raf=requestAnimationFrame(frame)}
 function frame(now){if(!active)return;let dt=Math.min(40,now-last);last=now;dist+=dt*(.035+save.boot*.004+save.gear*.002);loot+=dt*.0022;draw(now);$('distance').textContent=Math.floor(dist)+' m';$('runCoins').textContent=Math.floor(loot);let target=600+save.boot*115+save.gear*85;$('progressFill').style.width=Math.min(100,dist/target*100)+'%';let ei=eraAt(save.total+dist);$('eraLabel').textContent='ERA '+['I','II','III','IV','V'][ei]+' · '+eras[ei].name;if(dist>=target){finish();return}raf=requestAnimationFrame(frame)}
 function finish(){active=false;cancelAnimationFrame(raf);let earned=Math.floor(loot)+12+save.gear*2;save.bank+=earned;save.runs++;save.total+=Math.floor(dist);save.best=Math.max(save.best,Math.floor(dist));persist();$('hud').classList.add('hidden');$('progress').classList.add('hidden');$('overlay').classList.remove('hidden');let ei=eraAt(save.total);$('overlay').innerHTML='<div class="panel"><div class="kicker">Jornada concluída · '+eras[ei].name+'</div><h1>'+Math.floor(dist)+' METROS</h1><p>Você reuniu <b style="color:#e6bd76">'+earned+' fragmentos</b>. Sua jornada continua. Invista nos aprimoramentos e avance ainda mais.</p><button class="primary" id="again">CONTINUAR</button></div>';$('again').onclick=start;update();draw(performance.now())}
