@@ -38,7 +38,7 @@ const eras=[
 {name:'ERA DOS TITÃS',sky:['#483c42','#b97859'],far:'#76534b',mid:'#57413b',near:'#353a37',ground:'#202c2b',sun:'#f0a36f',accent:'#d18c64'},
 {name:'NOVO HORIZONTE',sky:['#334e59','#a4b9a2'],far:'#607d79',mid:'#416861',near:'#294b47',ground:'#1c3734',sun:'#ead7a0',accent:'#a9c9a7'}
 ];
-const eraImages=['assets/era-01-despertar.png','assets/era-02-terras-antigas.png','assets/era-03-era-do-gelo.png','assets/era-04-era-dos-titas.png','assets/era-05-novo-horizonte.png'].map(path=>{const im=new Image();im.src=path+'?v=20261115-png2';im.onload=()=>{if(!active)draw(performance.now())};return im;});
+const eraImages=['assets/world-01-despertar.svg','assets/world-02-terras-antigas.svg','assets/world-03-era-do-gelo.svg','assets/world-04-era-dos-titas.svg','assets/world-05-novo-horizonte.svg'].map(path=>{const im=new Image();im.src=path+'?v=20261115-art1';im.onload=()=>{if(!active)draw(performance.now())};return im;});
 let save={bank:0,best:0,runs:0,boot:0,gear:0,total:0};try{save={...save,...JSON.parse(localStorage.getItem('evora-save')||'{}')}}catch(e){}
 const persist=()=>localStorage.setItem('evora-save',JSON.stringify(save));
 const eraAt=n=>Math.min(4,Math.floor(n/1600));
