@@ -38,7 +38,7 @@ const eras=[
 {name:'ERA DOS TITÃS',sky:['#483c42','#b97859'],far:'#76534b',mid:'#57413b',near:'#353a37',ground:'#202c2b',sun:'#f0a36f',accent:'#d18c64'},
 {name:'NOVO HORIZONTE',sky:['#334e59','#a4b9a2'],far:'#607d79',mid:'#416861',near:'#294b47',ground:'#1c3734',sun:'#ead7a0',accent:'#a9c9a7'}
 ];
-const eraArt=new Image();eraArt.src='assets/eras.png?v=20261115-2';
+const eraImages=['assets/era-01-despertar.svg','assets/era-02-terras-antigas.svg','assets/era-03-gelo.svg','assets/era-04-titas.svg','assets/era-05-horizonte.svg'].map(path=>{const im=new Image();im.src=path+'?v=20261115-art1';return im;});
 let save={bank:0,best:0,runs:0,boot:0,gear:0,total:0};try{save={...save,...JSON.parse(localStorage.getItem('evora-save')||'{}')}}catch(e){}
 const persist=()=>localStorage.setItem('evora-save',JSON.stringify(save));
 const eraAt=n=>Math.min(4,Math.floor(n/1600));
@@ -90,27 +90,26 @@ if(save.gear>0){x.strokeStyle='#d9c28f';x.lineWidth=3;x.beginPath();x.moveTo(-11
 if(save.gear>2){x.strokeStyle='#e5d0a0';x.lineWidth=2;x.beginPath();x.arc(0,-46,19,-.9,.85);x.stroke()}
 x.restore();
 }
-function draw(t){if(!W||!H)return;let ei=eraAt(save.total+dist),e=eras[ei],scroll=active?dist:ambient,g=x.createLinearGradient(0,0,0,H);if(eraArt.complete&&eraArt.naturalWidth){x.drawImage(eraArt,ei*192,0,192,108,0,0,W,H)}else{g.addColorStop(0,e.sky[0]);g.addColorStop(1,e.sky[1]);x.fillStyle=g;x.fillRect(0,0,W,H)}
-let sx=W*.76-(scroll*.022%(W*.3));x.globalAlpha=.82;x.fillStyle=e.sun;x.beginPath();x.arc(sx,H*.23,Math.min(W,H)*.073,0,Math.PI*2);x.fill();x.globalAlpha=1;
-let glow=x.createRadialGradient(sx,H*.23,4,sx,H*.23,H*.36);glow.addColorStop(0,e.sun+'44');glow.addColorStop(1,e.sun+'00');x.fillStyle=glow;x.fillRect(0,0,W,H);
-ridge(H*.46,34,10,e.far,scroll);
- // maciços rochosos em planos distantes
- for(let m=0;m<4;m++){let mx=((m*W*.39-scroll*.10)%(W+W*.4)+W+W*.4)%(W+W*.4)-W*.12,base=H*(.59+(m%2)*.035),mw=W*(.18+(m%3)*.035),mh=H*(.17+(m%2)*.055);
- x.fillStyle=m%2?e.mid:e.far;x.beginPath();x.moveTo(mx-mw*.65,base);x.lineTo(mx-mw*.18,base-mh*.58);x.lineTo(mx+mw*.02,base-mh);x.lineTo(mx+mw*.18,base-mh*.56);x.lineTo(mx+mw*.43,base-mh*.76);x.lineTo(mx+mw*.72,base);x.closePath();x.fill();
- x.fillStyle='#ffffff18';x.beginPath();x.moveTo(mx+mw*.02,base-mh);x.lineTo(mx+mw*.18,base-mh*.56);x.lineTo(mx+mw*.08,base-mh*.63);x.closePath();x.fill();
+function draw(t){
+ if(!W||!H)return;
+ const ei=eraAt(save.total+dist),e=eras[ei],scroll=active?dist:ambient,im=eraImages[ei];
+ if(im&&im.complete&&im.naturalWidth){x.drawImage(im,0,0,W,H)}
+ else {const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,e.sky[0]);bg.addColorStop(1,e.sky[1]);x.fillStyle=bg;x.fillRect(0,0,W,H)}
+ // vinheta cinematográfica e profundidade atmosférica
+ const vignette=x.createLinearGradient(0,0,0,H);vignette.addColorStop(0,'#07121922');vignette.addColorStop(.62,'#07121900');vignette.addColorStop(1,'#07121988');x.fillStyle=vignette;x.fillRect(0,0,W,H);
+ const horizon=x.createLinearGradient(0,H*.58,0,H*.9);horizon.addColorStop(0,'#ffffff00');horizon.addColorStop(1,'#0a171a66');x.fillStyle=horizon.fillStyle||horizon;x.fillRect(0,H*.58,W,H*.32);
+ // trilha e pedras em primeiro plano com movimento contínuo
+ x.fillStyle='#111f20aa';x.beginPath();x.moveTo(0,H*.82);x.quadraticCurveTo(W*.46,H*.75,W,H*.82);x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();
+ for(let i=0;i<34;i++){
+  const px=((i*53-scroll*.88)%(W+60)+W+60)%(W+60)-30,py=H*.84+(i%5)*H*.026;
+  x.strokeStyle=i%4===0?e.accent+'bb':'#d8c7a044';x.lineWidth=i%4===0?1.7:1;
+  x.beginPath();x.moveTo(px,py);x.lineTo(px-3-(i%4),py-5-(i%4)*2);x.moveTo(px,py);x.lineTo(px+4+(i%3),py-5-(i%3)*2);x.stroke();
+  if(i%6===0){x.fillStyle='#0d191aaa';x.beginPath();x.ellipse(px+8,py+2,7,3,0,0,Math.PI*2);x.fill()}
  }
- ridge(H*.60,30,100,e.mid,scroll*.75);ridge(H*.71,22,220,e.near,scroll*1.3);
-for(let i=0;i<14;i++){let px=((i*127-scroll*.34)%(W+150)+W+150)%(W+150)-55,py=H*.72+Math.sin(i*8)*7; if(i%4===0)ruin(px,py,17+(i%3)*7,e.near);else pine(px,py,17+(i%4)*7,e.near)}
-x.fillStyle=e.ground;x.beginPath();x.moveTo(0,H*.78);x.quadraticCurveTo(W*.45,H*.69,W,H*.79);x.lineTo(W,H);x.lineTo(0,H);x.fill();
-let groundGlow=x.createLinearGradient(0,H*.77,0,H);groundGlow.addColorStop(0,'#ffffff12');groundGlow.addColorStop(1,'#00000055');x.fillStyle=groundGlow;x.fillRect(0,H*.77,W,H*.23);
-for(let i=0;i<46;i++){let px=((i*43-scroll*.9)%(W+45)+W+45)%(W+45)-20,py=H*.82+(i%6)*H*.031;x.strokeStyle=i%4===0?e.accent+'99':'#d7c29a38';x.lineWidth=1;x.beginPath();x.moveTo(px,py);x.lineTo(px+6,py-2-(i%4));x.stroke()}
-for(let i=0;i<10;i++){let px=((i*151-scroll*.6)%(W+100)+W+100)%(W+100)-40,py=H*(.35+(i%4)*.09);x.fillStyle=e.accent;x.globalAlpha=.15+((i%3)*.08);x.beginPath();x.arc(px,py+Math.sin(t*.001+i)*4,1.2+(i%2),0,Math.PI*2);x.fill()}x.globalAlpha=1;
-// vegetação baixa e pedras no primeiro plano
-for(let i=0;i<22;i++){let px=((i*79-scroll*.72)%(W+90)+W+90)%(W+90)-35,py=H*.81+(i%5)*H*.034;
-x.strokeStyle=i%3===0?e.accent+'aa':'#101f20aa';x.lineWidth=1.5;x.beginPath();x.moveTo(px,py);x.lineTo(px-3-(i%4),py-8-(i%3)*3);x.moveTo(px,py);x.lineTo(px+4+(i%3),py-6-(i%4)*2);x.stroke();
-if(i%5===0){x.fillStyle='#101c1d88';x.beginPath();x.ellipse(px+8,py+3,5,2,0,0,Math.PI*2);x.fill()}}
-drawRunner(W*.29,H*.78,t)}
-function update(){let ei=eraAt(save.total);$('best').textContent=save.best+' m';$('bank').textContent=save.bank;$('runs').textContent=save.runs;$('bestEra').textContent='ERA '+['I','II','III','IV','V'][ei];let a=30+save.boot*25,b=45+save.gear*35;$('bootCost').textContent='◇ '+a+' · NÍV. '+save.boot;$('gearCost').textContent='◇ '+b+' · NÍV. '+save.gear;$('uBoot').disabled=save.bank<a;$('uGear').disabled=save.bank<b;$('eraLabel').textContent='ERA '+['I','II','III','IV','V'][ei]+' · '+eras[ei].name}
+ // partículas de luz e poeira
+ for(let i=0;i<18;i++){const px=((i*91-scroll*.16)%(W+30)+W+30)%(W+30)-15,py=H*(.25+(i%6)*.095);x.fillStyle=e.accent;x.globalAlpha=.14+(i%4)*.07;x.beginPath();x.arc(px,py+Math.sin(t*.001+i)*5,1+(i%2)*.6,0,Math.PI*2);x.fill()}x.globalAlpha=1;
+ drawRunner(W*.29,H*.79,t);
+}function update(){let ei=eraAt(save.total);$('best').textContent=save.best+' m';$('bank').textContent=save.bank;$('runs').textContent=save.runs;$('bestEra').textContent='ERA '+['I','II','III','IV','V'][ei];let a=30+save.boot*25,b=45+save.gear*35;$('bootCost').textContent='◇ '+a+' · NÍV. '+save.boot;$('gearCost').textContent='◇ '+b+' · NÍV. '+save.gear;$('uBoot').disabled=save.bank<a;$('uGear').disabled=save.bank<b;$('eraLabel').textContent='ERA '+['I','II','III','IV','V'][ei]+' · '+eras[ei].name}
 function start(){if(active)return;active=true;dist=0;loot=0;last=performance.now();$('overlay').classList.add('hidden');$('hud').classList.remove('hidden');$('progress').classList.remove('hidden');raf=requestAnimationFrame(frame)}
 function frame(now){if(!active)return;let dt=Math.min(40,now-last);last=now;dist+=dt*(.035+save.boot*.004+save.gear*.002);loot+=dt*.0022;draw(now);$('distance').textContent=Math.floor(dist)+' m';$('runCoins').textContent=Math.floor(loot);let target=600+save.boot*115+save.gear*85;$('progressFill').style.width=Math.min(100,dist/target*100)+'%';let ei=eraAt(save.total+dist);$('eraLabel').textContent='ERA '+['I','II','III','IV','V'][ei]+' · '+eras[ei].name;if(dist>=target){finish();return}raf=requestAnimationFrame(frame)}
 function finish(){active=false;cancelAnimationFrame(raf);let earned=Math.floor(loot)+12+save.gear*2;save.bank+=earned;save.runs++;save.total+=Math.floor(dist);save.best=Math.max(save.best,Math.floor(dist));persist();$('hud').classList.add('hidden');$('progress').classList.add('hidden');$('overlay').classList.remove('hidden');let ei=eraAt(save.total);$('overlay').innerHTML='<div class="panel"><div class="kicker">Jornada concluída · '+eras[ei].name+'</div><h1>'+Math.floor(dist)+' METROS</h1><p>Você reuniu <b style="color:#e6bd76">'+earned+' fragmentos</b>. Sua jornada continua. Invista nos aprimoramentos e avance ainda mais.</p><button class="primary" id="again">CONTINUAR</button></div>';$('again').onclick=start;update();draw(performance.now())}
