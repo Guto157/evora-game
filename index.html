@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101a20"><title>ÉVORA — A jornada começa</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:dark;--gold:#e6bd76;--ink:#101a20;--muted:#a7b0ae}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#101a20;color:#f5f0e6;font-family:Manrope,system-ui,sans-serif}body{overflow-x:hidden}
+.app{min-height:100svh;position:relative;background:radial-gradient(ellipse at 50% 5%,#34464a 0%,#17252b 48%,#0d171d 100%);display:flex;flex-direction:column;align-items:center;padding:20px 16px 26px}
+.top{width:min(100%,980px);display:flex;justify-content:space-between;align-items:center;z-index:3}.brand{font:800 25px 'Barlow Condensed',sans-serif;letter-spacing:.28em;color:#f2dfbd}.brand span{color:var(--gold)}.chapter{font-size:10px;letter-spacing:.2em;color:#aab5b0;text-transform:uppercase}
+.stage{width:min(100%,980px);height:min(60vw,510px);min-height:310px;max-height:510px;position:relative;margin:18px auto 0;border:1px solid #a4b5aa36;border-radius:8px;overflow:hidden;box-shadow:0 24px 70px #0008;background:#293a3b}
+canvas{display:block;width:100%;height:100%}
+.vignette{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#101a2070,transparent 30%,transparent 70%,#101a2040),linear-gradient(0deg,#0b1419b0,transparent 42%,#14232a30)}
+.hud{position:absolute;inset:17px 18px auto;display:flex;justify-content:space-between;pointer-events:none;text-shadow:0 2px 8px #0008}.hud small{font-size:9px;letter-spacing:.18em;color:#e8d9bc;text-transform:uppercase}.hud strong{display:block;font:700 28px 'Barlow Condensed';letter-spacing:.04em}.hud .right{text-align:right}
+.center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;background:linear-gradient(0deg,#0d171d66,#0d171d20)}.panel{width:min(92%,430px);padding:27px 24px 24px;background:linear-gradient(145deg,#1c2b30ed,#101a20ed);border:1px solid #d9bd8050;box-shadow:0 18px 55px #0009;border-radius:5px;backdrop-filter:blur(8px)}
+.kicker{font-size:9px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase}.panel h1{font:800 clamp(38px,7vw,64px)/.9 'Barlow Condensed';letter-spacing:.08em;margin:12px 0 10px}.panel p{font-size:12px;line-height:1.7;color:#c2cbc4;margin:0 auto 20px;max-width:320px}
+.primary{border:0;background:linear-gradient(135deg,#f0d49a,#c08c4c);color:#1a211f;padding:14px 35px;font:800 14px 'Barlow Condensed';letter-spacing:.24em;cursor:pointer;min-width:190px;box-shadow:0 5px 18px #0005;transition:.2s}.primary:active{transform:translateY(2px);filter:brightness(.92)}
+.content{width:min(100%,980px);display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:15px}.card{background:linear-gradient(145deg,#1c2a2e,#142126);border:1px solid #b6c1b12b;padding:16px 18px;border-radius:5px;min-width:0}.cardhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.cardhead b{font:700 16px 'Barlow Condensed';letter-spacing:.13em}.cardhead span{font-size:9px;color:#aab4ae;letter-spacing:.15em;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{border-left:1px solid #d6b57465;padding-left:10px}.stat label{display:block;font-size:8px;letter-spacing:.12em;color:#9ba9a3;text-transform:uppercase}.stat strong{font:700 22px 'Barlow Condensed';color:#f0dfc0}
+.upgrades{display:grid;grid-template-columns:1fr 1fr;gap:8px}.upgrade{background:#26363a;border:1px solid #ffffff18;padding:10px;text-align:left;color:#f5f0e6;cursor:pointer}.upgrade:disabled{opacity:.4;cursor:default}.upgrade b{display:block;font:700 14px 'Barlow Condensed';letter-spacing:.08em}.upgrade small{font-size:9px;color:#aebbb2}.upgrade em{display:block;font-style:normal;color:var(--gold);font-size:10px;margin-top:5px}
+.footer{width:min(100%,980px);display:flex;justify-content:space-between;gap:10px;margin-top:14px;color:#778681;font-size:9px;letter-spacing:.12em;text-transform:uppercase}
+.hidden{display:none!important}
+@media(max-width:650px){.app{padding:15px 11px 22px}.stage{height:64vw;min-height:300px;margin-top:12px}.content{grid-template-columns:1fr}.card{padding:13px 14px}.top .chapter{font-size:8px}.hud strong{font-size:23px}.panel{padding:23px 17px}.footer{font-size:8px}}
+</style>
+</head>
+<body><main class="app">
+<header class="top"><div class="brand">ÉV<span>O</span>RA</div><div class="chapter" id="eraLabel">ERA I · O DESPERTAR</div></header>
+<section class="stage"><canvas id="world" aria-label="Paisagem da jornada de Évora"></canvas><div class="vignette"></div>
+<div class="hud hidden" id="hud"><div><small>Distância</small><strong id="distance">0 m</strong></div><div class="right"><small>Fragmentos</small><strong id="runCoins">0</strong></div></div>
+<div class="center" id="overlay"><div class="panel"><div class="kicker">Uma jornada através do tempo</div><h1>O MUNDO<br>ESTÁ À ESPERA.</h1><p>Um passo de cada vez. Atravesse eras esquecidas, reúna fragmentos e transforme sua própria história.</p><button class="primary" id="start">INICIAR JORNADA</button></div></div>
+</section>
+<section class="content">
+<div class="card"><div class="cardhead"><b>REGISTRO DA JORNADA</b><span id="bestEra">ERA I</span></div><div class="stats"><div class="stat"><label>Melhor distância</label><strong id="best">0 m</strong></div><div class="stat"><label>Fragmentos</label><strong id="bank">0</strong></div><div class="stat"><label>Jornadas</label><strong id="runs">0</strong></div></div></div>
+<div class="card"><div class="cardhead"><b>APRIMORAMENTOS</b><span>PERMANENTES</span></div><div class="upgrades"><button class="upgrade" id="uBoot"><b>PASSO FIRME</b><small>Mais resistência na jornada</small><em id="bootCost">◇ 30</em></button><button class="upgrade" id="uGear"><b>EQUIPAMENTO</b><small>Proteção e impulso extra</small><em id="gearCost">◇ 45</em></button></div></div>
+</section>
+<footer class="footer"><span>ÉVORA · CRÔNICAS DA ASCENSÃO</span><span>PROGRESSO SALVO NESTE DISPOSITIVO</span></footer>
+</main>
+<script>
+(()=>{
+const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');let W=0,H=0,dpr=1,raf=0,last=0,elapsed=0,dist=0,runLoot=0,active=false,phase=0;
+const $=id=>document.getElementById(id);
+const eras=[
+{name:'O DESPERTAR',sky:['#9aa99a','#d4b58a'],far:'#78877b',mid:'#536b61',near:'#344b43',ground:'#263b35',sun:'#f0d4a0'},
+{name:'TERRAS ANTIGAS',sky:['#b77d58','#e5b77d'],far:'#99755c',mid:'#6c5948',near:'#49483b',ground:'#333b32',sun:'#f4c17c'},
+{name:'ERA DE GELO',sky:['#7896a5','#c3d2d0'],far:'#a5b8b7',mid:'#708c91',near:'#49656b',ground:'#2d444b',sun:'#dce9df'},
+{name:'ERA DOS TITÃS',sky:['#493f43','#c07854'],far:'#75534b',mid:'#55413c',near:'#333b39',ground:'#202d2c',sun:'#f0a66c'},
+{name:'NOVO HORIZONTE',sky:['#384e58','#9bb6a2'],far:'#617d79',mid:'#426a63',near:'#294b47',ground:'#1d3835',sun:'#e9d69d'}
+];
+let save={bank:0,best:0,runs:0,boot:0,gear:0};try{save={...save,...JSON.parse(localStorage.getItem('evora-save')||'{}')}}catch(e){}
+const saveNow=()=>localStorage.setItem('evora-save',JSON.stringify(save));
+const eraIndex=()=>Math.min(4,Math.floor(save.best/900));
+function resize(){const r=canvas.getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw(0)}
+window.addEventListener('resize',resize);
+function path(points,fill){ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let p of points.slice(1))ctx.lineTo(p[0],p[1]);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle=fill;ctx.fill()}
+function ridge(y,amp,seed,color,scroll){let pts=[];for(let x=-40;x<=W+50;x+=35){let v=Math.sin((x+scroll*.12+seed)*.012)*amp+Math.sin((x+seed*9)*.027)*amp*.32;pts.push([x,y+v])}path(pts,color)}
+function tree(x,y,s,color){ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x,y-s*2.5);ctx.lineTo(x-s*.7,y-s*.8);ctx.lineTo(x-s*.34,y-s*.8);ctx.lineTo(x-s,y);ctx.lineTo(x+s,y);ctx.lineTo(x+s*.34,y-s*.8);ctx.lineTo(x+s*.7,y-s*.8);ctx.closePath();ctx.fill();ctx.fillStyle='#263a35';ctx.fillRect(x-s*.1,y-s*.15,s*.2,s*.5)}
+function draw(t){if(!W||!H)return;const e=eras[Math.min(4,Math.floor((save.best+dist)/900))],scroll=active?dist:phase;let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,e.sky[0]);g.addColorStop(1,e.sky[1]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+let sunX=W*.76-(scroll*.025%(W*.25));ctx.fillStyle=e.sun;ctx.globalAlpha=.78;ctx.beginPath();ctx.arc(sunX,H*.24,Math.min(W,H)*.075,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+ridge(H*.48,35,10,e.far,scroll);ridge(H*.59,28,100,e.mid,scroll*.8);ridge(H*.70,22,220,e.near,scroll*1.3);
+for(let i=0;i<18;i++){let x=((i*103-scroll*.42)%(W+120)+W+120)%(W+120)-30;let y=H*.71+Math.sin(i*8)*8;tree(x,y,18+(i%4)*7,e.near)}
+ctx.fillStyle=e.ground;ctx.beginPath();ctx.moveTo(0,H*.78);ctx.quadraticCurveTo(W*.45,H*.69,W,H*.79);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
+let grd=ctx.createLinearGradient(0,H*.77,0,H);grd.addColorStop(0,'#ffffff12');grd.addColorStop(1,'#00000055');ctx.fillStyle=grd;ctx.fillRect(0,H*.77,W,H*.23);
+for(let i=0;i<34;i++){let x=((i*47-scroll*.95)%(W+50)+W+50)%(W+50)-20,y=H*.82+(i%5)*H*.035;ctx.strokeStyle=i%3?'#d7c29a38':'#d7c29a70';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+8,y-2-(i%4));ctx.stroke()}
+drawRunner(W*.29,H*.77,t,e);
+}
+function drawRunner(x,y,t,e){let bob=active?Math.sin(t*.013)*4:0,leg=active?Math.sin(t*.018)*.55:Math.sin(t*.003)*.08;ctx.save();ctx.translate(x,y+bob);ctx.scale(1.1,1.1);
+ctx.fillStyle='#0b1719aa';ctx.beginPath();ctx.ellipse(0,5,23,6,0,0,Math.PI*2);ctx.fill();
+ctx.strokeStyle='#182326';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-3,-28);ctx.lineTo(-9+leg*12,-13);ctx.lineTo(-13+leg*18,0);ctx.moveTo(4,-27);ctx.lineTo(12-leg*12,-14);ctx.lineTo(15-leg*18,0);ctx.stroke();
+ctx.strokeStyle='#b18b60';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-13+leg*18,0);ctx.lineTo(-4+leg*18,0);ctx.moveTo(15-leg*18,0);ctx.lineTo(24-leg*18,0);ctx.stroke();
+ctx.fillStyle='#b5a083';ctx.beginPath();ctx.moveTo(-10,-56);ctx.lineTo(11,-56);ctx.lineTo(13,-28);ctx.lineTo(-8,-25);ctx.closePath();ctx.fill();
+ctx.fillStyle='#283a3b';ctx.beginPath();ctx.moveTo(-8,-52);ctx.lineTo(-18,-32);ctx.lineTo(-11,-29);ctx.lineTo(0,-43);ctx.closePath();ctx.fill();
+ctx.strokeStyle='#c3a276';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-7,-48);ctx.lineTo(-18,-34+Math.sin(t*.015)*3);ctx.moveTo(8,-47);ctx.lineTo(18,-34-Math.sin(t*.015)*3);ctx.stroke();
+ctx.fillStyle='#c69b76';ctx.beginPath();ctx.arc(1,-66,10,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#293638';ctx.beginPath();ctx.moveTo(-10,-68);ctx.quadraticCurveTo(-9,-83,6,-79);ctx.lineTo(13,-69);ctx.lineTo(-10,-67);ctx.fill();
+ctx.fillStyle='#d5b47d';ctx.fillRect(-9,-59,19,3);
+if(save.gear>0){ctx.strokeStyle='#d6bd8c';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-10,-51);ctx.lineTo(-14,-31);ctx.stroke();ctx.fillStyle='#b28b57';ctx.fillRect(8,-52,7,15)}
+if(save.boot>1){ctx.strokeStyle='#e0c18b';ctx.lineWidth=2;ctx.beginPath();ctx.arc(1,-43,18,-.8,.8);ctx.stroke()}
+ctx.restore()}
+function frame(now){if(!active)return;let dt=Math.min(40,now-last);last=now;elapsed+=dt;dist+=dt*(.035+save.boot*.004+save.gear*.002);runLoot+=dt*.0022;phase+=dt*.04;draw(now);$('distance').textContent=Math.floor(dist)+' m';$('runCoins').textContent=Math.floor(runLoot);let ei=Math.min(4,Math.floor((save.best+dist)/900));$('eraLabel').textContent='ERA '+['I','II','III','IV','V'][ei]+' · '+eras[ei].name; if(dist>=650+save.boot*90+save.gear*70){finish();return}raf=requestAnimationFrame(frame)}
+function start(){if(active)return;active=true;dist=0;runLoot=0;elapsed=0;last=performance.now();$('overlay').classList.add('hidden');$('hud').classList.remove('hidden');$('start').disabled=true;raf=requestAnimationFrame(frame)}
+function finish(){active=false;cancelAnimationFrame(raf);save.bank+=Math.floor(runLoot)+12+save.gear*2;save.runs++;save.best=Math.max(save.best,Math.floor(dist));saveNow();$('hud').classList.add('hidden');$('overlay').classList.remove('hidden');let era=Math.min(4,Math.floor(save.best/900));$('overlay').innerHTML='<div class="panel"><div class="kicker">Jornada concluída · '+eras[era].name+'</div><h1>'+Math.floor(dist)+' METROS</h1><p>Você reuniu <b style="color:#e6bd76">'+(Math.floor(runLoot)+12+save.gear*2)+' fragmentos</b>. Cada jornada deixa você mais preparado para ir além.</p><button class="primary" id="again">CONTINUAR</button></div>';$('again').onclick=start;update()}
+function upgrade(type){let cost=type==='boot'?30+save.boot*25:45+save.gear*35;if(save.bank<cost)return;save.bank-=cost;save[type]++;saveNow();update()}
+function update(){$('best').textContent=save.best+' m';$('bank').textContent=save.bank;$('runs').textContent=save.runs;$('bestEra').textContent='ERA '+['I','II','III','IV','V'][eraIndex()];let a=30+save.boot*25,b=45+save.gear*35;$('bootCost').textContent='◇ '+a+' · NÍV. '+save.boot;$('gearCost').textContent='◇ '+b+' · NÍV. '+save.gear;$('uBoot').disabled=save.bank<a;$('uGear').disabled=save.bank<b;$('eraLabel').textContent='ERA '+['I','II','III','IV','V'][eraIndex()]+' · '+eras[eraIndex()].name}
+$('start').onclick=start;$('uBoot').onclick=()=>upgrade('boot');$('uGear').onclick=()=>upgrade('gear');resize();update();setInterval(()=>{if(!active){phase+=.6;draw(performance.now())}},50);
+})();
+</script></body></html>
